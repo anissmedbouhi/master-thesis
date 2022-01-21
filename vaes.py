@@ -69,11 +69,14 @@ def vae(DataLoaderTrain, DataLoaderValidation, model, optimizer, LOSSES, weights
         LOSSES['validation'].append(np.sum(S)/C)
 
 
-def embedding_modified_vae(DataLoaderTrain, DataLoaderValidation, model, optimizer, LOSSES, VALIDATION = True, beta = 1, max_epoch = 100):
+def InvMap_VAE(DataLoaderTrain, DataLoaderValidation, model, optimizer, LOSSES, VALIDATION = True, beta = 1, weight_loss_embedding = 1.0, max_epoch = 100):
 
   C=max_epoch*len(DataLoaderTrain) # max_epoch* nmbr batch
   counter=0
   for epoch in range(max_epoch):
+
+      print(' epoch:', epoch)
+      
       for batch, (X_batch, y_batch, Z_embedding_batch) in tqdm(enumerate(DataLoaderTrain)):
 
           #beta=1+9*counter/C ## low beta->good reconstruction vs high beta->good disentanglement
@@ -85,7 +88,7 @@ def embedding_modified_vae(DataLoaderTrain, DataLoaderValidation, model, optimiz
 
           loss2 = MSE(Z_batch, Z_embedding_batch)
 
-          loss = loss1 + loss2
+          loss = loss1 + weight_loss_embedding*loss2
 
 
           optimizer.zero_grad()
@@ -116,7 +119,7 @@ def embedding_modified_vae(DataLoaderTrain, DataLoaderValidation, model, optimiz
 # Adaptation of the "Simplicial AutoEncoder" to a (Beta) Variational Auto-Encoder and giving the possibility to use a Gaussian Mixture Model Prior
 # using the Fuzzy simplicial complex built from the embedding via UMAP for example
 # To learn more about the "Simplicial AutoEncoder" of Jose Daniel Gallego Posada: https://esc.fnwi.uva.nl/thesis/centraal/files/f1267161058.pdf
-def simplicial_vae(X, DataLoaderTrain, model, optimizer, Z_embedding, dictKZ, LOSSES, weights_prior=None, means_prior=None, covariances_prior=None, GMM_prior=False, N = 64, weight_encoder_simplicial_reg = 10.0, weight_decoder_simplicial_reg = 10.0, beta = 1, max_epoch = 100, number_samples_lambdas = 10, alpha = 1.0):
+def Simplicial_VAE(X, DataLoaderTrain, model, optimizer, Z_embedding, dictKZ, LOSSES, weights_prior=None, means_prior=None, covariances_prior=None, GMM_prior=False, N = 64, weight_encoder_simplicial_reg = 10.0, weight_decoder_simplicial_reg = 10.0, beta = 1, max_epoch = 100, number_samples_lambdas = 10, alpha = 1.0):
   
   dictKZkeys = list(dictKZ.keys())
 
@@ -168,7 +171,7 @@ def simplicial_vae(X, DataLoaderTrain, model, optimizer, Z_embedding, dictKZ, LO
           LOSSES['train'].append(loss.item())
 
 # Modification in order to not use any embedding: simplicial regularization using a Fuzzy simplicial complex built directly from the input space data points
-def fuzzy_complex_regularized_vae(X, DataLoaderTrain, model, optimizer, dictKX, LOSSES, N = None, weight_encoder_simplicial_reg = 10.0, weight_decoder_simplicial_reg = 10.0, beta = 1, max_epoch = 100, number_samples_lambdas = 10, alpha = 1.0):
+def Fuzzy_Simplicial_VAE(X, DataLoaderTrain, model, optimizer, dictKX, LOSSES, N = None, weight_encoder_simplicial_reg = 10.0, weight_decoder_simplicial_reg = 10.0, beta = 1, max_epoch = 100, number_samples_lambdas = 10, alpha = 1.0):
   
   dictKXkeys = list(dictKX.keys())
 
@@ -214,7 +217,7 @@ def fuzzy_complex_regularized_vae(X, DataLoaderTrain, model, optimizer, dictKX, 
           # update the train loss
           LOSSES['train'].append(loss.item())
 
-def witness_complex_regularized_vae(X, DataLoaderTrain, model, optimizer, K_witnesscomplex, LOSSES, N = None, weight_encoder_simplicial_reg = 10.0, weight_decoder_simplicial_reg = 10.0, beta = 1, max_epoch = 100, number_samples_lambdas = 10, alpha = 1.0):
+def Witness_Simplicial_VAE(X, DataLoaderTrain, model, optimizer, K_witnesscomplex, LOSSES, N = None, weight_encoder_simplicial_reg = 10.0, weight_decoder_simplicial_reg = 10.0, beta = 1, max_epoch = 100, number_samples_lambdas = 10, alpha = 1.0):
   
   for epoch in range(max_epoch):
 
@@ -254,7 +257,7 @@ def witness_complex_regularized_vae(X, DataLoaderTrain, model, optimizer, K_witn
           LOSSES['train'].append(loss.item())
 
 
-def witness_complexes_regularized_vae(X, DataLoaderTrain, model, optimizer, K_witnesscomplexes, LOSSES, N = None, weight_encoder_simplicial_reg = 10.0, weight_decoder_simplicial_reg = 10.0, beta = 1, max_epoch = 100, number_samples_lambdas = 10, alpha = 1.0):
+def Witness_Complexes_Simplicial_VAE(X, DataLoaderTrain, model, optimizer, K_witnesscomplexes, LOSSES, N = None, weight_encoder_simplicial_reg = 10.0, weight_decoder_simplicial_reg = 10.0, beta = 1, max_epoch = 100, number_samples_lambdas = 10, alpha = 1.0):
   
   for epoch in range(max_epoch):
 
