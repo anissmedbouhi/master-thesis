@@ -1,5 +1,5 @@
 # Information
-This repository contains the code for my master thesis called "Towards topology-aware Variational Auto-Encoders: from InvMap-VAE to Witness Simplicial VAE" and for the related article entitled "InvMap and Witness Simplicial Variational Auto-Encoders". <br />
+This repository contains the code for my master thesis called "Towards topology-aware Variational Auto-Encoders: from InvMap-VAE to Witness Simplicial VAE" and for the related article entitled "InvMap and Witness Simplicial Variational Auto-Encoders" submitted to MDPI Machine Learning And Knowledge Extraction journal (under review). <br />
 <br />
 The work was performed at: Division of Robotics Perception and Learning, Department of Intelligent Systems, School of Electrical Engineering and Computer Science, KTH Royal Institute of Technology. <br />
 <br />
