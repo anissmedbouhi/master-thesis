@@ -16,3 +16,28 @@ Finally, the two first chapters of this master thesis can also be used as an int
 
 # Keywords
 Variational Auto-Encoder, Nonlinear dimensionality reduction, Generative model, Inverse projection, Computational topology, Algorithmic topology, Topological Data Analysis, Data visualisation, Unsupervised representation learning, Topological machine learning, Betti number, Simplicial complex, Witness complex, Simplicial map, Simplicial regularization.
+
+# Help
+All you need to run is in the main file.
+
+To run InvMap-VAE you need to run:
+- Directory, packages, and fix seeds
+- Define the dataset, train = (matrix X, colors)
+- Dimensionality reduction (to get the embedding you want to use)
+- Artificial Neural Networks: Model, and then InvMap-VAE
+- Results: Loss, latent space and reconstruction visualizations
+
+To run Witness Simplicial VAE you need to run:
+- Directory, packages, and fix seeds
+- Define the dataset, train = (matrix X, colors)
+- Build the Witness Complex directly from the input data space
+- Artificial Neural Networks: Model, and then Witness Simplicial VAE
+- Results: Loss, latent space and reconstruction visualizations
+
+To run Isolandmarks Witness Simplicial VAE you need to run:
+- Directory, packages, and fix seeds
+- Define the dataset, train = (matrix X, colors)
+- Build the Witness Complex directly from the input data space
+- Build approximative geodesics distance matrix of the landmarks points given a witness complex
+- Artificial Neural Networks: Model, and then Isolandmarks Witness Simplicial VAE
+- Results: Loss, latent space and reconstruction visualizations
