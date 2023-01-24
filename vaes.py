@@ -297,3 +297,73 @@ def Witness_Complexes_Simplicial_VAE(X, DataLoaderTrain, model, optimizer, K_wit
 
           # update the train loss
           LOSSES['train'].append(loss.item())
+
+
+
+def Isolandmarks_Witness_Simplicial_VAE(train, train_, X, DataLoaderTrain, model, optimizer, K_witnesscomplex, landmarks, landmarks_distance_matrix, LOSSES, LOSS1, LOSS2, LOSS3, LOSS4, N = None, weight_encoder_simplicial_reg = 10.0, weight_decoder_simplicial_reg = 10.0, weight_landmarks_metric_learning = 10.0, beta = 1, max_epoch = 100, number_samples_lambdas = 10, alpha = 1.0):
+  landmarks_distance_matrix = torch.from_numpy(landmarks_distance_matrix).float().cuda()
+  landmarks_distance_matrix = landmarks_distance_matrix**2
+
+  for epoch in range(max_epoch):
+
+      print(' epoch:', epoch)
+
+      for batch, (x, y, id_batch) in tqdm(enumerate(DataLoaderTrain)):
+
+          model = model.train()
+
+          recon_x, z, mu, logvar = model(x)
+
+          loss1 = MSEKLD(recon_x, x, mu, logvar, beta)
+
+##### beginning simplicial regularizations losses computations #####
+          if N == None: # if considering all the simplices of K_witnesscomplex
+            choicesX = K_witnesscomplex
+          else: # if considering only N simplices chosen randomly from K_witnesscomplex
+            choicesX = np.random.choice(K_witnesscomplex, N, replace = False) 
+
+          choicesX = np.repeat(choicesX, number_samples_lambdas)
+          simplicesX = [ cuda(X[name, ...]) for name in choicesX ]
+          
+          #simplicesZ = [ model.encoder(cuda(X[name, ...]))[0] for name in choicesX ] if we do not want to sample but just take the mean mu of encoder(x)
+          simplicesZ = [ model.encoder(cuda(X[name, ...]), sample = True) for name in choicesX ] # if we sample, with sampling z=encoder(x)
+
+          lambdas = [ cuda(np.random.dirichlet(len(name) * [alpha])) for name in choicesX ]
+
+          loss2 = SimplicialLossCode(f = model.encoder, selection1 = simplicesX, selection2 = simplicesZ, lambdas = lambdas)
+          loss3 = SimplicialLossCode(f = model.decoder, selection1 = simplicesZ, selection2 = simplicesX, lambdas = lambdas)
+##### end simplicial regularizations losses computations #####
+
+
+##### beginning isometric learning on landmarks loss 4
+          #loss4 is like Isomap but between the distance matrices of input landmarks and encoded landmarks
+          landmarksZ = model.encoder(cuda(landmarks), sample = True) #landmarksZ = model.encoder(cuda(landmarks), sample = False)[0] if we do not want to sample
+          #print('landmarksZ is cuda:', landmarksZ.is_cuda)
+          ##landmarksZ_distance_matrix = torch.sqrt(((landmarksZ.unsqueeze(0)-landmarksZ.unsqueeze(1))**2).sum(-1)) #first implementation but NaN problems in the loss
+          landmarksZ_distance_matrix = ((landmarksZ.unsqueeze(0)-landmarksZ.unsqueeze(1))**2).sum(-1) #like having the matrix of the squares of the distances. We got rid of the square root to avoid NaN problems in the loss because of a diverging gradient (gradient of square root function diverging towards infinity around 0)
+
+          isomap_term = isomap_kernel(landmarks_distance_matrix)-isomap_kernel(landmarksZ_distance_matrix)
+          ##loss4 = torch.norm(isomap_term, p='fro')/len(landmarks)
+          loss4 = torch.einsum("ij, ij ->", isomap_term, isomap_term)/len(landmarks) #torch.einsum("ij, ij ->", isomap_term, isomap_term) is a faster way of doing torch.sum(isomap_term**2) which is the sum of the element-wise product, which is equal to the square of the Frobenius norm for matrices. We got rid of the square root to avoid NaN problems in the loss (see previous comment)
+##### end isometric learning on landmarks loss 4
+
+          loss = loss1 + weight_encoder_simplicial_reg * loss2 + weight_decoder_simplicial_reg * loss3 + weight_landmarks_metric_learning * loss4
+
+          #print('loss', loss)
+
+          optimizer.zero_grad()
+          loss.backward()
+          optimizer.step()
+
+          # update the train loss
+          LOSSES['train'].append(loss.item())
+          LOSS1['train'].append(loss1.item())
+          LOSS2['train'].append(loss2.item())
+          LOSS3['train'].append(loss3.item())
+          LOSS4['train'].append(loss4.item())
+          
+      if epoch%10==0:
+        model = model.eval()
+        X_recon_train, Z_train, _, _ = model(train_.tensors[0])
+        model.embedding_ = Z_train.detach().cpu().numpy()
+        plot_embedding_2d(model, train)

@@ -22,7 +22,7 @@ from models import save_model, load_model
 from losses import *
 
 from plots import *
-from utils import split, cuda
+from utils import split, cuda, isomap_kernel
 
 umap_ = umap.umap_
 from algebraic import find_cut_alphas, create_simplicial_complex, flatten_complex, plot_graph
@@ -30,3 +30,5 @@ from algebraic import find_cut_alphas, create_simplicial_complex, flatten_comple
 from torch.utils.data import TensorDataset, DataLoader
 
 from vaes import *
+
+from dijkstra import *

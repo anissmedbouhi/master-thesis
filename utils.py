@@ -23,3 +23,10 @@ def split(dataset, percentage_train, percentage_validation, percentage_test, per
     test = ( matrix[idx_validation:], colors[idx_validation:] )
 
     return train, validation, test
+
+def isomap_kernel(D): #input should be a distance matrix D
+    N = D.shape[0] # number of points considered
+    I = torch.eye(N).cuda()
+    A = torch.ones(N,N).cuda()
+    return -0.5*torch.matmul(torch.matmul(I-(1/N)*A,torch.matmul(D,D)),(I-(1/N)*A))
+    
