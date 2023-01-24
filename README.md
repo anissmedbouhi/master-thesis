@@ -47,9 +47,9 @@ To run Isolandmarks Witness Simplicial VAE you need to run:
 This project was made possible thanks to my supervisors and colleagues at RPL. We are very thankful to Giovanni Lucas Marchetti for all the helpful and inspiring discussions, and his valuable feedback. I am also very thankful to Achraf Bzili for his help with technical implementation at the time of the master thesis.
 
 Sources directly used for the implementations of our methods:
-https://github.com/MrBellamonte/AEs-VAEs-TDA/blob/master/src/topology/witness_complex.py thank you Simon!
-https://github.com/crixodia/python-dijkstra/blob/master/dijkstra.py gracias Cristian Bastidas!
+- https://github.com/MrBellamonte/AEs-VAEs-TDA/blob/master/src/topology/witness_complex.py thank you Simon!
+- https://github.com/crixodia/python-dijkstra/blob/master/dijkstra.py gracias Cristian Bastidas!
 
 Sources used as inspiration to start with the project:
-https://github.com/BorgwardtLab/topological-autoencoders
-https://github.com/jgalle29/simplicial from Jose Gallego-Posada.
+- https://github.com/BorgwardtLab/topological-autoencoders
+- https://github.com/jgalle29/simplicial from Jose Gallego-Posada.
